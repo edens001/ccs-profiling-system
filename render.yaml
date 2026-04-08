@@ -1,0 +1,42 @@
+# render.yaml - Blueprint for deploying CCS Profiling System on Render
+
+services:
+  # ============================================
+  # BACKEND API SERVICE (PHP + MySQL)
+  # ============================================
+  - type: web
+    name: ccs-profiling-backend
+    runtime: image
+    repo: https://github.com/Jimmuelkang2/ccs-profiling-system
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    rootDir: backend
+    envVars:
+      - key: MYSQL_HOST
+        value: your-mysql-host.aivencloud.com
+      - key: MYSQL_DATABASE
+        value: defaultdb
+      - key: MYSQL_USER
+        value: avnadmin
+      - key: MYSQL_PASSWORD
+        value: your-aiven-password-here
+      - key: MYSQL_PORT
+        value: "12345"
+
+  # ============================================
+  # FRONTEND STATIC SITE (Vue.js)
+  # ============================================
+  - type: static
+    name: ccs-profiling-frontend
+    repo: https://github.com/endens001/ccs-profiling-system
+    plan: free
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    publishPath: dist
+    envVars:
+      - key: VITE_API_BASE_URL
+        value: https://ccs-profiling-backend.onrender.com/api
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
