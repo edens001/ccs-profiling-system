@@ -1,29 +1,28 @@
-# Dockerfile for PHP Backend API
+# Dockerfile - Install PostgreSQL PHP extension
 FROM php:8.2-apache
 
-# Install required PHP extensions
-RUN docker-php-ext-install mysqli pdo pdo_mysql
+# Install PostgreSQL PHP extensions (instead of MySQL)
+RUN apt-get update && \
+    apt-get install -y libpq-dev && \
+    docker-php-ext-install pdo_pgsql pgsql mbstring bcmath
 
-# Enable Apache mod_rewrite for routing
-RUN a2enmod rewrite
+# Enable Apache modules
+RUN a2enmod rewrite headers
 
-# Copy all backend files to Apache's web directory
-COPY . /var/www/html/
+# Copy backend files
+COPY backend/ /var/www/html/backend/
 
-# Set proper permissions
+# Copy frontend files
+COPY frontend/dist/ /var/www/html/
+
+# Set permissions
 RUN chown -R www-data:www-data /var/www/html && \
     chmod -R 755 /var/www/html
 
-# Configure Apache to use .htaccess files
-RUN echo "<Directory /var/www/html>\n\
-    Options Indexes FollowSymLinks\n\
-    AllowOverride All\n\
-    Require all granted\n\
-</Directory>" > /etc/apache2/conf-available/custom.conf && \
-    a2enconf custom
-
-# Set custom document root to point to api/admin folder
-# (since your API endpoints are in /api/admin/)
-RUN sed -i 's|/var/www/html|/var/www/html/api/admin|g' /etc/apache2/sites-available/000-default.conf
+# Create .htaccess for Vue.js routing
+RUN echo "RewriteEngine On" > /var/www/html/.htaccess && \
+    echo "RewriteCond %{REQUEST_FILENAME} !-f" >> /var/www/html/.htaccess && \
+    echo "RewriteCond %{REQUEST_FILENAME} !-d" >> /var/www/html/.htaccess && \
+    echo "RewriteRule ^ index.html [L]" >> /var/www/html/.htaccess
 
 EXPOSE 80
