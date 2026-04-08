@@ -11,10 +11,14 @@ COPY frontend/package*.json ./
 COPY frontend/package-lock.json* ./
 
 # Install dependencies with legacy peer deps for Vue CLI compatibility
-RUN npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+# Fix: Add npx and ensure proper permissions
+RUN npm install --legacy-peer-deps
 
 # Copy frontend source code
 COPY frontend/ ./
+
+# Fix: Use npx to run vue-cli-service or fix permissions
+RUN chmod +x node_modules/.bin/vue-cli-service || true
 
 # Build Vue.js app (outputs to 'dist' folder)
 RUN npm run build
