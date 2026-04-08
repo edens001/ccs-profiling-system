@@ -22,8 +22,7 @@ RUN echo "<Directory /var/www/html>\n\
 </Directory>" > /etc/apache2/conf-available/custom.conf && \
     a2enconf custom
 
-# Set custom document root to point to api/admin folder
-# (since your API endpoints are in /api/admin/)
-RUN sed -i 's|/var/www/html|/var/www/html/api/admin|g' /etc/apache2/sites-available/000-default.conf
+# Keep default document root - serve from root directory
+# Your API should be accessible via /api/admin/ path
 
 EXPOSE 80
