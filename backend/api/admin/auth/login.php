@@ -35,6 +35,62 @@ if (empty($data->username) || empty($data->password)) {
     exit;
 }
 
+// ==============================================
+// HARDCODED ADMIN ACCOUNT (Temporary for Render.com)
+// Remove this block once database is deployed!
+// ==============================================
+$hardcoded_admin = [
+    'username' => 'admin@ccs.edu',  // or 'admin'
+    'email' => 'admin@ccs.edu',
+    'password' => 'password',        // Plain text password
+    'first_name' => 'System',
+    'last_name' => 'Administrator',
+    'role' => 'admin',
+    'admin_level' => 'Admin',
+    'department' => 'CCS'
+];
+
+// Check if credentials match hardcoded admin
+if ($data->username === $hardcoded_admin['username'] || 
+    $data->username === $hardcoded_admin['username']) {
+    
+    if ($data->password === $hardcoded_admin['password']) {
+        // Generate JWT token
+        $token_data = [
+            'id' => 99999, // Fake ID for hardcoded admin
+            'username' => $hardcoded_admin['username'],
+            'email' => $hardcoded_admin['email'],
+            'role' => $hardcoded_admin['role'],
+            'admin_level' => $hardcoded_admin['admin_level']
+        ];
+        
+        $token = $jwt->generate($token_data);
+        
+        http_response_code(200);
+        echo json_encode([
+            'success' => true,
+            'message' => 'Login successful (Hardcoded Admin Mode)',
+            'token' => $token,
+            'user' => [
+                'id' => 99999,
+                'username' => $hardcoded_admin['username'],
+                'email' => $hardcoded_admin['email'],
+                'name' => $hardcoded_admin['first_name'] . ' ' . $hardcoded_admin['last_name'],
+                'first_name' => $hardcoded_admin['first_name'],
+                'last_name' => $hardcoded_admin['last_name'],
+                'role' => $hardcoded_admin['role'],
+                'admin_level' => $hardcoded_admin['admin_level'],
+                'admin_level_display' => 'Administrator',
+                'department' => $hardcoded_admin['department']
+            ]
+        ]);
+        exit; // Stop execution - don't check database
+    }
+}
+// ==============================================
+// END OF HARDCODED ADMIN SECTION
+// ==============================================
+
 try {
     // Check if username is email or username
     $is_email = filter_var($data->username, FILTER_VALIDATE_EMAIL);
