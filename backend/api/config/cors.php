@@ -10,7 +10,8 @@ $allowed_origins = [
     'http://127.0.0.1:8081',
     'http://localhost:3000', // Add your Vue dev server port
     'http://localhost:5173', // Vite default port
-    'http://localhost:5174'  // Alternative Vite port
+    'http://localhost:5174',  // Alternative Vite port
+    'https://ccs-profiling-system-1.onrender.com' // ADDED: Your Render.com frontend
 ];
 
 // Check if the origin is allowed
@@ -18,11 +19,13 @@ if (in_array($http_origin, $allowed_origins)) {
     header("Access-Control-Allow-Origin: $http_origin");
 } else {
     // For development, allow all localhost origins
-    if (strpos($http_origin, 'http://localhost') === 0 || strpos($http_origin, 'http://127.0.0.1') === 0) {
+    if (strpos($http_origin, 'http://localhost') === 0 || 
+        strpos($http_origin, 'http://127.0.0.1') === 0 ||
+        strpos($http_origin, 'https://ccs-profiling-system-1.onrender.com') === 0) { // ADDED: Allow Render.com
         header("Access-Control-Allow-Origin: $http_origin");
     } else {
-        // Default fallback
-        header("Access-Control-Allow-Origin: http://localhost:8080");
+        // Default fallback - CHANGE THIS to your Render URL
+        header("Access-Control-Allow-Origin: https://ccs-profiling-system-1.onrender.com");
     }
 }
 
